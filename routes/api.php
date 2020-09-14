@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\ProductsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +18,5 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 
-Route::post('/product','ProductsController@insert');
-
-
-Route::get('/search','ProductsController@search');
+Route::post('/product',[ProductsController::class, 'insert']);
+Route::get('/search',[ProductsController::class, 'search']);

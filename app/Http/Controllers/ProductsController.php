@@ -35,24 +35,24 @@ class ProductsController extends Controller
         if ($searchResult->total() < 1) {
 
             $searchResult = $this->prefixMatch($request);
-            $array = $searchResult->models()->pluck("title")->all();
+            $array = array_unique(array_column($this->flattenSearchDocument($searchResult), "title"));
             $fuzzyProducts = $this->fuzzyProductsMatch($request);
 
             if ($searchResult->total() < 1) {
 
                 $designerSuggest = $this->suggestionMatch('designer', $request);
-                $designers = $designerSuggest->models()->pluck("designer")->all();
+                $designers = array_unique(array_column($this->flattenSearchDocument($designerSuggest), "designer"));
 
                 $titleSuggest = $this->suggestionMatch('title', $request);
-                $titles = $titleSuggest->models()->pluck("title")->all();
+                $titles = array_unique(array_column($this->flattenSearchDocument($titleSuggest), "title"));
 
-                return $this->makeResponse($request, "did_you_mean", [], $designers, $titles, ...$fuzzyProducts);
+                return $this->makeResponse($request, "did_you_mean", [], $designers, $titles, $this->flattenSearchDocument($fuzzyProducts));
             }
 
-            return $this->makeResponse($request, "suggestion", $array, [], [], ...$fuzzyProducts);
+            return $this->makeResponse($request, "suggestion", $array, [], [], $this->flattenSearchDocument($fuzzyProducts));
         }
 
-        return $this->makeResponse($request, "products", [], [], [], ...$searchResult);
+        return $this->makeResponse($request, "products", [], [], [], $this->flattenSearchDocument($searchResult));
     }
 
 
@@ -72,7 +72,7 @@ class ProductsController extends Controller
         $searchResult = products::boolSearch()
             ->must('match', [$fieldName => $request->query("q")])
             ->execute();
-        return $this->makeResponse($request, "products", [], [], [], ...$searchResult);
+        return $this->makeResponse($request, "products", [], [], [], $this->flattenSearchDocument($searchResult));
     }
 
     private function exactMatch(SearchRequest $request): SearchResult
@@ -92,10 +92,10 @@ class ProductsController extends Controller
     private function suggestionMatch(string $field, SearchRequest $request): SearchResult
     {
         return products::boolSearch()
-            ->mustRaw(['match', [$field => [
+            ->must('match', [$field => [
                 'query' => $request->query("q"),
                 'fuzziness' => 5
-            ]]])
+            ]])
             ->execute();
     }
 
@@ -136,9 +136,9 @@ class ProductsController extends Controller
                                   array $suggestion,
                                   array $designers,
                                   array $names,
-                                  products ...$products)
+                                  array $products)
     {
-        return resposne()->json([
+        return response()->json([
             "query" => $request->query("q"),
             'reference' => $reference,
             'suggestion' => $suggestion,
@@ -148,5 +148,16 @@ class ProductsController extends Controller
             ],
             'products' => $products,
         ]);
+    }
+
+    private function flattenSearchDocument(SearchResult $result): array
+    {
+        $array = [];
+
+        foreach ($result->documents() as $doc){
+            $array[] = $doc->getContent();
+        }
+
+        return $array;
     }
 }

@@ -176,7 +176,7 @@
       <workItem from="1599829156579" duration="382000" />
       <workItem from="1600060864222" duration="14041000" />
       <workItem from="1600081061269" duration="147000" />
-      <workItem from="1600081209982" duration="8223000" />
+      <workItem from="1600081209982" duration="13753000" />
     </task>
     <servers />
   </component>
@@ -188,6 +188,10 @@
       <screen x="0" y="48" width="2560" height="1552" />
     </state>
     <state x="802" y="611" width="949" height="428" key="#Composer/0.48.2560.1552@0.48.2560.1552" timestamp="1600081092750" />
+    <state x="376" y="276" width="1947" height="1208" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1600092893896">
+      <screen x="0" y="48" width="2560" height="1552" />
+    </state>
+    <state x="376" y="276" width="1947" height="1208" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.48.2560.1552@0.48.2560.1552" timestamp="1600092893896" />
     <state x="751" y="356" width="1052" height="938" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1600083458003">
       <screen x="0" y="48" width="2560" height="1552" />
     </state>
