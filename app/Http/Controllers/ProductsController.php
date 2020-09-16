@@ -1,13 +1,42 @@
 <?php namespace App\Http\Controllers;
 
-use App\Http\Requests\SearchRequest;
 use App\Models\products;
 use Elasticsearch\ClientBuilder;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\SearchRequest;
+use App\Http\Requests\ProductRequest;
 
 class ProductsController extends Controller
 {
+    /**
+     * insert into DB and sync it with elasticsearch
+     * @param ProductRequest $request
+     * @return JsonResponse
+     */
+    public function insert(ProductRequest $request): JsonResponse
+    {
+        $product = new products();
 
-    public function search(SearchRequest $request)
+        $product->title = $request->input("title");
+        $product->size = $request->input("size");
+        $product->price = $request->input("price");
+        $product->designer = $request->input("designer");
+        $product->summary = $request->input("summary");
+        $product->thumbnail = $request->input("thumbnail");
+        $product->product_id = $request->input("product_id");
+        $product->tags = $request->input("tags");
+
+        $product->save();
+
+        return response()->json(["message" => "ok"], 201);
+    }
+
+    /**
+     * search products
+     * @param SearchRequest $request
+     * @return JsonResponse
+     */
+    public function search(SearchRequest $request): JsonResponse
     {
         if (!empty($request->query("field"))) {
             return $this->exactOnSpecificField($request);
@@ -17,7 +46,12 @@ class ProductsController extends Controller
     }
 
 
-    private function exactOnSpecificField(SearchRequest $request)
+    /**
+     * exact match on specific field
+     * @param SearchRequest $request
+     * @return JsonResponse
+     */
+    private function exactOnSpecificField(SearchRequest $request): JsonResponse
     {
         $fieldName = $request->query("field");
         $fieldName = ($fieldName == "name") ? "title" : $fieldName;
@@ -35,7 +69,11 @@ class ProductsController extends Controller
     }
 
 
-    private function find($request)
+    /**
+     * @param $request
+     * @return JsonResponse
+     */
+    private function find($request): JsonResponse
     {
         $params = [
             'body' => [
@@ -58,7 +96,13 @@ class ProductsController extends Controller
     }
 
 
-    private function flattenSearchDocument(SearchRequest $request, array $result)
+    /**
+     * flatten search document
+     * @param SearchRequest $request
+     * @param array $result
+     * @return JsonResponse
+     */
+    private function flattenSearchDocument(SearchRequest $request, array $result): JsonResponse
     {
         //we performed 5 query and use the indexes to get each query data
         if (isset($result['responses']) && count($result['responses']) !== 5) {
@@ -87,14 +131,25 @@ class ProductsController extends Controller
     }
 
 
-    //TODO use laravel resources and collections
+
+    /**
+     * make response
+     * @param SearchRequest $request
+     * @param string $reference
+     * @param array $suggestion
+     * @param array $designers
+     * @param array $names
+     * @param array $products
+     * @return JsonResponse
+     */
     private function makeResponse(SearchRequest $request,
                                   string $reference,
                                   array $suggestion,
                                   array $designers,
                                   array $names,
-                                  array $products)
+                                  array $products): JsonResponse
     {
+        //TODO use laravel resources and collections
         return response()->json([
             "query" => $request->query("q"),
             'reference' => $reference,

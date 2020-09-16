@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Http\Requests;
+<?php   namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -26,7 +24,7 @@ class ProductRequest extends FormRequest
         return [
             'title' => 'required',
             'size' => 'required',
-            'price' => 'required|float',
+            'price' => 'required|numeric',
             'designer' => 'required',
             'summary' => 'required',
             'tags' => 'required',
